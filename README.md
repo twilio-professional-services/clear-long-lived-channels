@@ -2,9 +2,9 @@ This repository introduces a solution for a use case: when customers need to set
 
 # Initiating Outbound SMS From Flex and keeping the chat channel long_lived
 
-When creating the Flex flow before calling the function above, setting the LongLived to true will make every channel created from the Flex flow stay long lived, which means even after the agent wraps up and completes the task, the next time when a customer writes to the same number, a new task will be created, but all the chat history from this channel will be retained - https://github.com/twilio-professional-services/function-flex-outbound-sms/blob/master/README.md#create-direct-to-task-flex-flow
+When creating the Flex flow, setting the LongLived to true will make every channel created from the Flex flow stay long lived, which means even after the agent wraps up and completes the task, the next time when a customer sends messages to the same number, a new task will be created, but the chat channel will remain the same - https://github.com/twilio-professional-services/function-flex-outbound-sms/blob/master/README.md#create-direct-to-task-flex-flow
 
-Using long-lived Chat Channels, while helpful for the agent experience, could present problems with security and performance at scale. The next step will introduce the design to clean these chat channels.
+Using long-lived Chat Channels, while it's helpful for the agent experience, could present problems with security and performance at scale. The next session we will talk about the common use cases you might want to clean these channels so as to create new one, and go through the details how we use Twilio functions to achieve this goal.
 
 ## Example Use Cases for cleaning long-lived chat channel
 
