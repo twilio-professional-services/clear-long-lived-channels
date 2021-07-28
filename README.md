@@ -1,6 +1,4 @@
-This repository introduces a solution for the use case: during Flex implementation, when developers need to set their Flex chat channel to be long-lived, in order to show the chat history even after the chat task has been completed or closed by the agent who handles the task. There might be some point of time developers would like to go ahead and clear those channels, using two known ways: 1) delete the channel directly using Twilio API call https://www.twilio.com/docs/chat/rest/channel-resource#delete-a-channel-resource
-
-2. disable the long-lived setting from this channel , and set the channel to be inactive, in this case a brand new channel will be created next time when a new chat message comes in. Since the chat channel is still retained in Twilio's database, you can retrieve the channel information when you need using Twilio API: https://www.twilio.com/docs/chat/rest/channel-resource#fetch-a-channel-resource. This code sample is using the 2) solution.
+This repository introduces a solution for a use case: when customers need to set their chat channel to be long-lived, in order to show the chat history even after the chat task has been completed or closed by the agent. At some point of time you want to go ahead and clear those channels (we will talk about 3 use cases as examples below), using two possible ways: 1) delete the channel 2) disable the long-lived setting from this channel , and set the channel to be inactive, in this case a brand new channel will be created next time when a new chat message comes in. Since the chat channel is still retained in Twilio's database, you can retrieve the channel information when you need using Twilio API: https://www.twilio.com/docs/chat/rest/channel-resource#fetch-a-channel-resource. This code sample is using the 2) solution.
 
 # Initiating Outbound SMS From Flex and keeping the chat channel long_lived
 
@@ -8,7 +6,7 @@ When creating the Flex flow before calling the function above, setting the LongL
 
 Using long-lived Chat Channels, while helpful for the agent experience, could present problems with security and performance at scale. The next step will introduce the design to clean these chat channels.
 
-## Example Use Cases for cleanning long-lived chat channel
+## Example Use Cases for cleaning long-lived chat channel
 
 1. When agent initiates outbound SMS message, and doesn't hear back from the customer for a long period of time (i.e several days), the agent closes the task in Flex UI. Sometime after the agent does that, you might want to consider to reset this channel and remove the long lived setting.
 
