@@ -20,6 +20,8 @@ Using long-lived Chat Channels, while it's helpful for the agent experience, cou
 
 This function (eventstream.js) serves as a webhook endpoint and listens to Twilio event stream updates to receive the latest status of the channel, including task status and the corresponding timestamp. After receiving these data from event stream in real time, the function will create or update the document under Twilio Sync. In this design, one chat channel SID relates one document in Twilio Sync Service, upcoming task status update will only update the Sync Doc if it already exists without creating new document.
 
+<img src="https://user-images.githubusercontent.com/82540340/127408108-24bc4a14-5c32-48cd-aca7-1f71961fd49e.png">
+
 ## Register to event stream
 
 Event Streams is an API that allows you to tap into a unified stream of every interaction sent or received on Twilio.
