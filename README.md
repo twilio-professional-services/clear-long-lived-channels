@@ -6,7 +6,7 @@ When creating the Flex flow before calling the function above, setting the LongL
 
 Using long-lived Chat Channels, while helpful for the agent experience, could present problems with security and performance at scale. The next step will introduce the design to clean these chat channels.
 
-## Example Use Cases for cleanning long-lived chat channel
+## Example Use Cases for cleaning long-lived chat channel
 
 1. When agent initiates outbound SMS message, and doesn't hear back from the customer for a long period of time (i.e several days), the agent closes the task in Flex UI. Sometime after the agent does that, you might want to consider to reset this channel and remove the long lived setting.
 
