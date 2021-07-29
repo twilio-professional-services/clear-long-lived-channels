@@ -18,7 +18,7 @@ Using long-lived Chat Channels, while it's helpful for the agent experience, cou
 
 ## Overview
 
-This function (eventstream.js) serves as a webhook endpoint and listens to Twilio event stream updates to receive the latest status of the channel, including task status and the corresponding timestamp. After receiving these data from event stream in real time, the function will create or update the document under Twilio Sync. In this design, one chat channel SID relates one document in Twilio Sync Service, upcoming task status update will only update the Sync Doc if it already exists without creating new document.
+This function (eventstream.js) serves as a webhook endpoint and listens to Twilio event stream updates to receive the latest status of the channel, including task status and the corresponding timestamp. After receiving these data from event stream in real time, the function will create or update the document under Twilio Sync. In this design, one chat channel SID relates one document in Twilio Sync Service, upcoming task status update will only update the Sync Doc if it already exists without creating new document. A task router event contains the task information, which itself contains the chat channel SID that the task associates with, the function retrives the channel SID and makes it as an identifier of this sync doc.
 
 <img src="https://user-images.githubusercontent.com/82540340/127408108-24bc4a14-5c32-48cd-aca7-1f71961fd49e.png">
 
@@ -26,7 +26,7 @@ This function (eventstream.js) serves as a webhook endpoint and listens to Twili
 
 Event Streams is an API that allows you to tap into a unified stream of every interaction sent or received on Twilio.
 
-We are using the function URL as a webhook endpoint, so creating a webhook sink:
+We are using the function URL as a webhook endpoint, and we can start with creating a webhook sink:
 
 twilio api:events:v1:sinks:create --description <add sink description here> \
 --sink-configuration '{"destination":"${your webhook endpoint}","method":"${POST or GET}","batch_events":${true or false}}' \
@@ -42,7 +42,7 @@ com.twilio.taskrouter.task.wrapup
 For new task creation, we need this event:
 com.twilio.taskrouter.task.created
 
-Sample SINK and Event registration commands:
+Sample SINK and Event registration commands-replace the destination with your own Twilio function endpoint:
 
 twilio api:events:v1:sinks:create --description webhookfortask \
 --sink-configuration '{"destination":"https://webhookeventstream-5008.twil.io/eventstream","method":"POST”, ”batch_events":true}’ \
@@ -52,7 +52,7 @@ twilio api:events:v1:subscriptions:create --description "all messages" --sink-si
 
 ## Create Sync Doc
 
-Try to fetch the Sync Doc by the doc's unique name, here we use prefix + Channel SID. If an existing Sync Doc with the Channel SID related to the task from event stream doesn't exist, we will use this API to create a new Sync Doc.
+Try to fetch the Sync Doc by the doc's unique name, here we use prefix + Channel SID - prefix could be Strings that you define. If an existing Sync Doc related to the task from event stream doesn't exist - means this channel SID isn't stored in the Sync Doc, we will use this API to create a new Sync Doc.
 
 https://www.twilio.com/docs/sync/api/document-resource
 
@@ -69,6 +69,6 @@ Then the function will look up the channel, find out the current channel attribu
 channelAttributes.long_lived = false;
 channelAttributes.status = "INACTIVE";
 
-After resetting this channel attribute, next time when a customer texts the number, or agent initiates outbound SMS with the same customer's phone number, a new channel will be created. Since the new channel is created using the same long-lived Flex Flow, this channel will be long-lived from the beginning.
+After resetting this channel attribute, next time when a customer sends new message to this number, or agent initiates outbound SMS with the same customer's phone number, a new channel will be created. Since the new channel is created using the same long-lived defined Flex Flow, this channel will be long-lived from the very beginning.
 
 # Twilio Service and function deployment
