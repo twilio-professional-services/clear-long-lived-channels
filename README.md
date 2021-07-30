@@ -72,3 +72,5 @@ channelAttributes.status = "INACTIVE";
 After resetting this channel attribute, next time when a customer sends new message to this number, or agent initiates outbound SMS with the same customer's phone number, a new channel will be created. Since the new channel is created using the same long-lived defined Flex Flow, this channel will be long-lived from the very beginning.
 
 # Twilio Service and function deployment
+
+cd into the folder and run twilio serverless:deploy to deploy 2 functions, the service name would be the same with the folder's name: clear long lived channel
