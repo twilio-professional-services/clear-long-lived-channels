@@ -55,27 +55,12 @@ exports.handler = async function (context, event, callback) {
     responseBody.success = true;
     responseBody.payload.message = "Update the sync doc.";
   } catch (e) {
-    updatePromises.push(
-      client.sync.services(syncServiceSid).documents.create({
-        data: {
-          eventtype: eventType,
-          timestamp: timestamp,
-          taskattributes: taskattribute,
-          channelsid: channelSID,
-          msg: payload,
-        },
-        uniqueName: syncDocumentName,
-      })
-    );
-
-    Promise.all(updatePromises);
-
     console.error(e.message || e);
 
-    response.setStatusCode(e.status || 200);
+    response.setStatusCode(e.status || 400);
 
-    responseBody.success = true;
-    responseBody.payload.message = "Created sync doc.";
+    responseBody.success = false;
+    responseBody.payload.message = "Error creating sync doc.";
   }
   response.setBody(responseBody);
   return callback(null, response);
