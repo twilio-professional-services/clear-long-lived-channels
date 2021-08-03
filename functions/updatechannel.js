@@ -1,71 +1,67 @@
+exports.handler = async function (context, event, callback) {
+  //Constructing Twilio API client
+  const { ACCOUNT_SID, AUTH_TOKEN } = context;
+  const client = require("twilio")(ACCOUNT_SID, AUTH_TOKEN);
 
-// This is your new function. To start, set the name and path on the left.
-
-exports.handler = async function(context, event, callback) {
-  const {
-    ACCOUNT_SID, 
-    AUTH_TOKEN,
-  } = context;
-  const client = require('twilio')(ACCOUNT_SID, AUTH_TOKEN);
-  
   const response = new Twilio.Response();
-  
-  response.appendHeader('Access-Control-Allow-Origin', '*');
-  response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS POST');
-  response.appendHeader('Content-Type', 'application/json');
-  response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  const syncService = 'IS3a7134931a45629601274a855b9642af';
-  const chatService = 'IS14251c39981a41308cb433978ab8624d';
+
+  response.appendHeader("Access-Control-Allow-Origin", "*");
+  response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST");
+  response.appendHeader("Content-Type", "application/json");
+  response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  //Replace with your own syncService and chatService ID
+  const syncService = "IS3a7134931a45629601274a855b9642af";
+  const chatService = "IS14251c39981a41308cb433978ab8624d";
   let documents;
   let channel;
   let channelUpdate;
-  
-  //logic to find current channel 
+
+  //Logic to fetch all documents from this sync service
   try {
-    documents = await client.sync.services(syncService)
-           .documents
-           .list({limit: 20})
-    
-  } catch(e){
+    documents = await client.sync.services(syncService).documents.list();
+  } catch (e) {
     console.error(`Error finding sync doc!`);
     throw e;
   }
-  
-  for (const element of documents) {
-    let data = element['data'];
-    console.log("This is data" + data);
-    let eventType = data['eventtype'];
-    let channelSid = data['channelsid'];
+
+  //TODO: using Map to reduce latency
+  //TODO: identify the channel depends on last updated timestamp
+  for (element of documents) {
+    const data = element["data"];
+    const eventType = data["eventtype"];
+    const channelSid = data["channelsid"];
     if (eventType == "task.completed") {
       try {
-         channel = await client
-           .chat
+        channel = await client.chat
           .services(chatService)
           .channels(channelSid)
-          .fetch()
-      } catch(e){
-           console.log("problems fetching the channel")
-           throw e;
+          .fetch();
+      } catch (e) {
+        console.log("problems fetching the channel");
+        throw e;
       }
-      
-      let channelAttributes = JSON.parse(channel.attributes);
+
+      const channelAttributes = JSON.parse(channel.attributes);
       channelAttributes.long_lived = false;
       channelAttributes.status = "INACTIVE";
       channelUpdate = {
-         attributes: JSON.stringify(channelAttributes)}
+        attributes: JSON.stringify(channelAttributes),
+      };
     }
-       try {
-         await client.chat.services(chatService)
-                .channels(channelSid)
-                .update(channelUpdate)
-         
-       } catch(e){
-         console.log("Error update the channel");
-         throw e;
-       }
+    try {
+      await client.chat
+        .services(chatService)
+        .channels(channelSid)
+        .update(channelUpdate);
+
+      response.setBody("Updated channels to short lived");
+    } catch (e) {
+      console.log("Error update the channel");
+      response.setBody("Error updating channel to short lived");
+      throw e;
+    }
   }
-  
-  response.setBody("Updated channel to short lived");
+
   return callback(null, response);
 };
